@@ -62,6 +62,7 @@ class NewNoteFragment : Fragment() {
         titleText = view.findViewById(R.id.titleText)
         noteText = view.findViewById(R.id.noteText)
 
+        println("${notesViewModel.note}")
         titleText.setText(notesViewModel.note.title)
         noteText.setText(notesViewModel.note.content)
         setNoteColor(notesViewModel.note.color)
@@ -75,36 +76,10 @@ class NewNoteFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
             android.R.id.home -> {
-                if(notesViewModel.notePosition == -1){
-                    notesViewModel.noteTitle = titleText.text.toString()
-                    notesViewModel.noteContent = noteText.text.toString()
-                    if(notesViewModel.noteTitle.isNotEmpty() || notesViewModel.noteContent.isNotEmpty()){
-                        insertNote()
-                    }
-                }else{
-                    notesViewModel.noteTitle = titleText.text.toString()
-                    notesViewModel.noteContent = noteText.text.toString()
-                    notesViewModel.noteColor = notesViewModel.noteColor
-                    notesViewModel.noteId = notesViewModel.dbNotesList.value!![notesViewModel.notePosition].id!!
-                    updateNoteInDB()
-                }
-                moveToNotesFragment()
+                insertOrUpdateDb()
             }
             R.id.done -> {
-                if(notesViewModel.notePosition == -1){
-                    notesViewModel.noteTitle = titleText.text.toString()
-                    notesViewModel.noteContent = noteText.text.toString()
-                    if(notesViewModel.noteTitle.isNotEmpty() || notesViewModel.noteContent.isNotEmpty()){
-                        insertNote()
-                    }
-                }else{
-                    notesViewModel.noteTitle = titleText.text.toString()
-                    notesViewModel.noteContent = noteText.text.toString()
-                    notesViewModel.noteColor = notesViewModel.noteColor
-                    notesViewModel.noteId = notesViewModel.dbNotesList.value!![notesViewModel.notePosition].id!!
-                    updateNoteInDB()
-                }
-                moveToNotesFragment()
+                insertOrUpdateDb()
             }
             R.id.delete -> {
                 if(notesViewModel.notePosition != -1){
@@ -119,6 +94,23 @@ class NewNoteFragment : Fragment() {
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun insertOrUpdateDb() {
+        if(notesViewModel.notePosition == -1){
+            notesViewModel.noteTitle = titleText.text.toString()
+            notesViewModel.noteContent = noteText.text.toString()
+            if(notesViewModel.noteTitle.isNotEmpty() || notesViewModel.noteContent.isNotEmpty()){
+                insertNote()
+            }
+        }else{
+            notesViewModel.noteTitle = titleText.text.toString()
+            notesViewModel.noteContent = noteText.text.toString()
+            notesViewModel.noteColor = notesViewModel.noteColor
+            notesViewModel.noteId = notesViewModel.dbNotesList.value!![notesViewModel.notePosition].id!!
+            updateNoteInDB()
+        }
+        moveToNotesFragment()
     }
 
     private fun openColorPicker() {
@@ -155,10 +147,7 @@ class NewNoteFragment : Fragment() {
     }
 
     private suspend fun deleteNoteFromDB(note: Note) {
-//        val contentResolver = (activity as AppCompatActivity).contentResolver!!
-//        val result = contentResolver.query(NotesProvider.CONTENT_URI, arrayOf(NotesProvider.COLUMN_ID, NotesProvider.COLUMN_TITLE, NotesProvider.COLUMN_NOTE, NotesProvider.COLUMN_COLOR), null, null, NotesProvider.COLUMN_ID)
-//        contentResolver.delete(NotesProvider.CONTENT_URI, "ID = ?",arrayOf(noteId.toString()))
-//        result?.requery()
+
 
         appDb.noteDao().delete(note)
 
@@ -166,15 +155,7 @@ class NewNoteFragment : Fragment() {
 
     private fun updateNoteInDB() {
 
-//        val contentResolver = (activity as AppCompatActivity).contentResolver!!
-//        val result = contentResolver.query(NotesProvider.CONTENT_URI, arrayOf(NotesProvider.COLUMN_ID, NotesProvider.COLUMN_TITLE, NotesProvider.COLUMN_NOTE, NotesProvider.COLUMN_COLOR), null, null, NotesProvider.COLUMN_ID)
-//        println("COLOR = ${notesViewModel.noteColor}")
-//        val cv = ContentValues()
-//        cv.put(NotesProvider.COLUMN_TITLE, notesViewModel.noteTitle)
-//        cv.put(NotesProvider.COLUMN_NOTE, notesViewModel.noteContent)
-//        cv.put(NotesProvider.COLUMN_COLOR, notesViewModel.noteColor)
-//        contentResolver.update(NotesProvider.CONTENT_URI, cv, "ID = ?", arrayOf(notesViewModel.noteId.toString()))
-//        result?.requery()
+
 
         GlobalScope.launch {
             appDb.noteDao().update(notesViewModel.noteId, notesViewModel.noteTitle, notesViewModel.noteContent, notesViewModel.noteColor)
@@ -182,14 +163,7 @@ class NewNoteFragment : Fragment() {
     }
 
     private fun insertNote() {
-//        val contentResolver = (activity as AppCompatActivity).contentResolver!!
-//        val result = contentResolver?.query(NotesProvider.CONTENT_URI, arrayOf(NotesProvider.COLUMN_ID, NotesProvider.COLUMN_TITLE, NotesProvider.COLUMN_NOTE, NotesProvider.COLUMN_COLOR), null, null, NotesProvider.COLUMN_ID)
-//        val cv = ContentValues()
-//        cv.put(NotesProvider.COLUMN_TITLE, notesViewModel.noteTitle)
-//        cv.put(NotesProvider.COLUMN_NOTE, notesViewModel.noteContent)
-//        cv.put(NotesProvider.COLUMN_COLOR, notesViewModel.noteColor)
-//        contentResolver.insert(NotesProvider.CONTENT_URI, cv)
-//        result?.requery()
+
 
         GlobalScope.launch {
             appDb.noteDao().insert(Note(null, notesViewModel.noteTitle, notesViewModel.noteContent, notesViewModel.noteColor))

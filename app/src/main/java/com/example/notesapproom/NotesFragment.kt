@@ -63,6 +63,7 @@ class NotesFragment : Fragment() {
 
         adapter.setOnItemClickListener(object : OnItemClickListener {
             override fun onItemClick(position: Int) {
+                println("setting: ${viewModel.dbNotesList.value!![position]}")
                 viewModel.note = viewModel.dbNotesList.value!![position]
                 viewModel.notePosition = position
                 parentFragmentManager.commit {
@@ -73,50 +74,36 @@ class NotesFragment : Fragment() {
         })
 
         val recyclerView = view.findViewById<RecyclerView>(R.id.notes_recyclerView)
+        recyclerView.layoutManager = GridLayoutManager(context, 2)
+
         GlobalScope.launch {
-            val job=launch {
-                getNotesList()
+            var list: MutableList<Note>
+            val job= launch {
+                list=getNotesList()
+                withContext(Dispatchers.Main){
+                    viewModel.dbNotesList.value=list
+                }
             }
             job.join()
+            println("inside global launch - launch - ${viewModel.dbNotesList.value}")
             withContext(Dispatchers.Main){
                 viewModel.dbNotesList.value?.let { adapter.setNotesList(it) }
-
                 recyclerView.adapter = adapter
-                recyclerView.layoutManager = GridLayoutManager(context, 2)
             }
         }
 
         viewModel.dbNotesList.observe(viewLifecycleOwner, Observer{
+            println("Coming to live observer")
             adapter.setNotesList(it)
+            recyclerView.adapter = adapter
             adapter.notifyDataSetChanged()
         })
-
     }
 
-    private fun getNotesList() {
-//        val contentResolver = (activity as AppCompatActivity).contentResolver!!
-//        val result = contentResolver.query(NotesProvider.CONTENT_URI, arrayOf(NotesProvider.COLUMN_ID, NotesProvider.COLUMN_TITLE, NotesProvider.COLUMN_NOTE, NotesProvider.COLUMN_COLOR), null, null, NotesProvider.COLUMN_ID)
-//        if(result!!.moveToNext()){
-//            viewModel.dbNotesList = mutableListOf()
-//            do{
-//                val id = result.getInt(0)
-//                val title = result.getString(1)
-//                val content = result.getString(2)
-//                val color = result.getString(3)
-//                viewModel.dbNotesList.add(Note(id, title, content, color))
-//            }while(result.moveToNext())
-//        }else{
-//            viewModel.dbNotesList = mutableListOf()
-//        }
-//        result.close()
+    private fun getNotesList():MutableList<Note> {
 
-//            viewModel.dbNotesList = appDb.noteDao().getAll() as MutableList<Note>
-
-
-        viewModel.dbNotesList.postValue(appDb.noteDao().getAll() as MutableList<Note>)
-
-
-
+        val newList = appDb.noteDao().getAll()
+        return newList
 
     }
 

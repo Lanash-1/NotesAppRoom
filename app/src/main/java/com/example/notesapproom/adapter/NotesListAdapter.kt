@@ -12,7 +12,7 @@ class NotesListAdapter : RecyclerView.Adapter<NotesListAdapter.NotesListViewHold
     OnItemClickListener {
     private lateinit var listener: OnItemClickListener
 
-    private lateinit var notesList: List<Note>
+    private var notesList = listOf<Note>()
 
     fun setNotesList(notesList: List<Note>){
         println("NOTE LIST SET: $notesList")
