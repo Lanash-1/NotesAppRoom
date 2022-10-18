@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/dashboard"
+        android:title="DashBoard" />
+
+    <item
+        android:id="@+id/deleted"
+        android:title="Deleted" />
+
+    <item
+        android:id="@+id/settings"
+        android:title="Settings" />
+
+</menu>

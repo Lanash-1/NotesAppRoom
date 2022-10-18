@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">NotesAppRoom</string>
+    <string name="search">search</string>
+    <string name="more">more</string>
+    <string name="content_description_search">searchNotes</string>
+    <string name="open">Open</string>
+    <string name="close">Close</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="create_note">Create Note</string>
 </resources>

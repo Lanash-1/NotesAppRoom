@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:title="color picker"
+        android:id="@+id/colorPicker"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_baseline_color_lens_24" />
+
+    <item
+        android:title="delete"
+        android:id="@+id/delete"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_baseline_delete_forever_24" />
+
+    <item
+        android:title="done"
+        android:id="@+id/done"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_baseline_done_24" />
+
+
+</menu>
