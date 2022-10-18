@@ -75,11 +75,6 @@ class NewNoteFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
             android.R.id.home -> {
-                moveToNotesFragment()
-
-            }
-            R.id.done -> {
-                println(notesViewModel.notePosition)
                 if(notesViewModel.notePosition == -1){
                     notesViewModel.noteTitle = titleText.text.toString()
                     notesViewModel.noteContent = noteText.text.toString()
@@ -90,7 +85,23 @@ class NewNoteFragment : Fragment() {
                     notesViewModel.noteTitle = titleText.text.toString()
                     notesViewModel.noteContent = noteText.text.toString()
                     notesViewModel.noteColor = notesViewModel.noteColor
-                    notesViewModel.noteId = notesViewModel.dbNotesList[notesViewModel.notePosition].id!!
+                    notesViewModel.noteId = notesViewModel.dbNotesList.value!![notesViewModel.notePosition].id!!
+                    updateNoteInDB()
+                }
+                moveToNotesFragment()
+            }
+            R.id.done -> {
+                if(notesViewModel.notePosition == -1){
+                    notesViewModel.noteTitle = titleText.text.toString()
+                    notesViewModel.noteContent = noteText.text.toString()
+                    if(notesViewModel.noteTitle.isNotEmpty() || notesViewModel.noteContent.isNotEmpty()){
+                        insertNote()
+                    }
+                }else{
+                    notesViewModel.noteTitle = titleText.text.toString()
+                    notesViewModel.noteContent = noteText.text.toString()
+                    notesViewModel.noteColor = notesViewModel.noteColor
+                    notesViewModel.noteId = notesViewModel.dbNotesList.value!![notesViewModel.notePosition].id!!
                     updateNoteInDB()
                 }
                 moveToNotesFragment()
@@ -98,7 +109,7 @@ class NewNoteFragment : Fragment() {
             R.id.delete -> {
                 if(notesViewModel.notePosition != -1){
                     GlobalScope.launch {
-                        deleteNoteFromDB(notesViewModel.dbNotesList[notesViewModel.notePosition])
+                        deleteNoteFromDB(notesViewModel.dbNotesList.value!![notesViewModel.notePosition])
                     }
                 }
                 moveToNotesFragment()

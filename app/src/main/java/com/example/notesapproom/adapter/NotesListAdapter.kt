@@ -15,6 +15,7 @@ class NotesListAdapter : RecyclerView.Adapter<NotesListAdapter.NotesListViewHold
     private lateinit var notesList: List<Note>
 
     fun setNotesList(notesList: List<Note>){
+        println("NOTE LIST SET: $notesList")
         this.notesList = notesList
     }
 

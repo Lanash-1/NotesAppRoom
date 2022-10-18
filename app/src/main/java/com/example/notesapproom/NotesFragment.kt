@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.commit
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.notesapproom.adapter.NotesListAdapter
@@ -19,8 +20,10 @@ import com.example.notesapproom.data.Note
 import com.example.notesapproom.data.NoteDatabase
 import com.example.notesapproom.viewModel.NotesViewModel
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class NotesFragment : Fragment() {
 
@@ -28,8 +31,6 @@ class NotesFragment : Fragment() {
     private val viewModel: NotesViewModel by activityViewModels()
 
     private lateinit var appDb: NoteDatabase
-
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -62,7 +63,7 @@ class NotesFragment : Fragment() {
 
         adapter.setOnItemClickListener(object : OnItemClickListener {
             override fun onItemClick(position: Int) {
-                viewModel.note = viewModel.dbNotesList[position]
+                viewModel.note = viewModel.dbNotesList.value!![position]
                 viewModel.notePosition = position
                 parentFragmentManager.commit {
                     replace(R.id.notesFragment, NewNoteFragment())
@@ -72,11 +73,24 @@ class NotesFragment : Fragment() {
         })
 
         val recyclerView = view.findViewById<RecyclerView>(R.id.notes_recyclerView)
-        getNotesList()
-        adapter.setNotesList(viewModel.dbNotesList)
+        GlobalScope.launch {
+            val job=launch {
+                getNotesList()
+            }
+            job.join()
+            withContext(Dispatchers.Main){
+                viewModel.dbNotesList.value?.let { adapter.setNotesList(it) }
 
-        recyclerView.adapter = adapter
-        recyclerView.layoutManager = GridLayoutManager(context, 2)
+                recyclerView.adapter = adapter
+                recyclerView.layoutManager = GridLayoutManager(context, 2)
+            }
+        }
+
+        viewModel.dbNotesList.observe(viewLifecycleOwner, Observer{
+            adapter.setNotesList(it)
+            adapter.notifyDataSetChanged()
+        })
+
     }
 
     private fun getNotesList() {
@@ -96,9 +110,13 @@ class NotesFragment : Fragment() {
 //        }
 //        result.close()
 
-        GlobalScope.launch {
-            viewModel.dbNotesList = appDb.noteDao().getAll() as MutableList<Note>
-        }
+//            viewModel.dbNotesList = appDb.noteDao().getAll() as MutableList<Note>
+
+
+        viewModel.dbNotesList.postValue(appDb.noteDao().getAll() as MutableList<Note>)
+
+
+
 
     }
 
