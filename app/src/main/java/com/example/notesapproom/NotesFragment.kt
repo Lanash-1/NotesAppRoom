@@ -13,7 +13,9 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.commit
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.example.notesapproom.adapter.NotesListAdapter
 import com.example.notesapproom.interfaces.OnItemClickListener
 import com.example.notesapproom.data.Note

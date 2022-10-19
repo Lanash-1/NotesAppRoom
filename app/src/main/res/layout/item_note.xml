@@ -2,11 +2,11 @@
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/itemLayout"
-    android:layout_width="170dp"
-    android:layout_height="170dp"
+    android:layout_width="match_parent"
+    android:layout_height="180dp"
     android:background="#fff"
-    android:layout_margin="16dp"
-    android:hapticFeedbackEnabled="true"
+    android:layout_marginStart="16dp"
+    android:layout_marginTop="16dp"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <TextView
@@ -31,7 +31,7 @@
         android:id="@+id/noteText"
         android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam ultrices neque vel leo blandit facilisis. Integer non tincidunt odio. Nulla iaculis dictum est, eu porttitor turpis fringilla eget. In eu semper nunc, vitae auctor ex. Cras pretium, elit at venenatis commodo, odio mauris cursus turpis, quis malesuada orci felis a lorem. Nullam quis dictum mauris, et aliquet nunc. Sed ipsum orci, mollis vitae varius ac, gravida eget nisl. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas."
         android:ellipsize="end"
-        android:maxLines="5"
+        android:maxLines="6"
         android:textColor="@color/black"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -40,6 +40,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
+        android:layout_marginTop="8dp"
         android:textSize="14sp"
     />
 
