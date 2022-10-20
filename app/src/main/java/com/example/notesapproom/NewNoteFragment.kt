@@ -3,6 +3,7 @@ package com.example.notesapproom
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.widget.EditText
 import android.widget.TextView
@@ -22,7 +23,6 @@ import com.example.notesapproom.viewModel.NotesViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-
 
 class NewNoteFragment : Fragment() {
 
@@ -147,24 +147,16 @@ class NewNoteFragment : Fragment() {
     }
 
     private suspend fun deleteNoteFromDB(note: Note) {
-
-
         appDb.noteDao().delete(note)
-
     }
 
     private fun updateNoteInDB() {
-
-
-
         GlobalScope.launch {
             appDb.noteDao().update(notesViewModel.noteId, notesViewModel.noteTitle, notesViewModel.noteContent, notesViewModel.noteColor)
         }
     }
 
     private fun insertNote() {
-
-
         GlobalScope.launch {
             appDb.noteDao().insert(Note(null, notesViewModel.noteTitle, notesViewModel.noteContent, notesViewModel.noteColor))
         }
@@ -176,5 +168,6 @@ class NewNoteFragment : Fragment() {
             parentFragmentManager.popBackStack()
         }
     }
+
 
 }

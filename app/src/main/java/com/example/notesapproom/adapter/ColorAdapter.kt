@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.notesapproom.databinding.ItemColorBinding
 import com.example.notesapproom.interfaces.OnItemClickListener
 
-class ColorAdapter: RecyclerView.Adapter<ColorAdapter.ColorViewHolder>(), OnItemClickListener {
+class ColorAdapter: RecyclerView.Adapter<ColorAdapter.ColorViewHolder>() {
 
     private lateinit var listener: OnItemClickListener
 
@@ -47,7 +47,4 @@ class ColorAdapter: RecyclerView.Adapter<ColorAdapter.ColorViewHolder>(), OnItem
         return colorList.size
     }
 
-    override fun onItemClick(position: Int) {
-        TODO("Not yet implemented")
-    }
 }

@@ -1,25 +1,27 @@
 package com.example.notesapproom
 
 // imports
+import android.content.res.Configuration
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.commit
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.example.notesapproom.adapter.NotesListAdapter
 import com.example.notesapproom.interfaces.OnItemClickListener
 import com.example.notesapproom.data.Note
 import com.example.notesapproom.data.NoteDatabase
+import com.example.notesapproom.interfaces.OnNoteOptionsClickListener
 import com.example.notesapproom.viewModel.NotesViewModel
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.Dispatchers
@@ -30,9 +32,10 @@ import kotlinx.coroutines.withContext
 class NotesFragment : Fragment() {
 
     private var adapter = NotesListAdapter()
-    private val viewModel: NotesViewModel by activityViewModels()
+    private val notesViewModel: NotesViewModel by activityViewModels()
 
     private lateinit var appDb: NoteDatabase
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -51,12 +54,13 @@ class NotesFragment : Fragment() {
             setBackgroundDrawable(ColorDrawable(Color.parseColor("#ffffff")))
         }
 
+        val recyclerView = view.findViewById<RecyclerView>(R.id.notes_recyclerView)
 
         val fab = view.findViewById<FloatingActionButton>(R.id.create_note_fab)
 
         fab.setOnClickListener {
-            viewModel.note = Note(0, "", "", "#DDDDDD")
-            viewModel.notePosition = -1
+            notesViewModel.note = Note(0, "", "", "#EEEEEE")
+            notesViewModel.notePosition = -1
             parentFragmentManager.commit {
                 replace(R.id.notesFragment, NewNoteFragment())
                 addToBackStack(null)
@@ -65,9 +69,8 @@ class NotesFragment : Fragment() {
 
         adapter.setOnItemClickListener(object : OnItemClickListener {
             override fun onItemClick(position: Int) {
-                println("setting: ${viewModel.dbNotesList.value!![position]}")
-                viewModel.note = viewModel.dbNotesList.value!![position]
-                viewModel.notePosition = position
+                notesViewModel.note = notesViewModel.dbNotesList.value!![position]
+                notesViewModel.notePosition = position
                 parentFragmentManager.commit {
                     replace(R.id.notesFragment, NewNoteFragment())
                     addToBackStack(null)
@@ -75,38 +78,67 @@ class NotesFragment : Fragment() {
             }
         })
 
-        val recyclerView = view.findViewById<RecyclerView>(R.id.notes_recyclerView)
-        recyclerView.layoutManager = GridLayoutManager(context, 2)
+        adapter.setOnNoteOptionsClickListener(object: OnNoteOptionsClickListener{
+            override fun deleteNote(position: Int) {
+                val noteToBeDeleted = notesViewModel.dbNotesList.value!![position]
+                GlobalScope.launch {
+                    deleteNoteFromDb(noteToBeDeleted)
+                }
+            }
+
+            override fun addToFavorite(position: Int) {
+                Log.d(null, "add to favorie")
+            }
+
+            override fun shareNote(position: Int) {
+                Log.d(null, "share note")
+            }
+        })
+
+        recyclerView.adapter = adapter
+
+        if(activity?.resources?.configuration?.orientation == Configuration.ORIENTATION_PORTRAIT){
+            recyclerView.layoutManager = GridLayoutManager(context, 2)
+        }else{
+            recyclerView.layoutManager = GridLayoutManager(context, 4)
+        }
+
 
         GlobalScope.launch {
             var list: MutableList<Note>
             val job= launch {
                 list=getNotesList()
                 withContext(Dispatchers.Main){
-                    viewModel.dbNotesList.value=list
+                    notesViewModel.dbNotesList.value=list
                 }
             }
             job.join()
-            println("inside global launch - launch - ${viewModel.dbNotesList.value}")
             withContext(Dispatchers.Main){
-                viewModel.dbNotesList.value?.let { adapter.setNotesList(it) }
-                recyclerView.adapter = adapter
+                notesViewModel.dbNotesList.value?.let { adapter.setNotesList(it) }
             }
         }
 
-        viewModel.dbNotesList.observe(viewLifecycleOwner, Observer{
-            println("Coming to live observer")
+        notesViewModel.dbNotesList.observe(viewLifecycleOwner, Observer{
             adapter.setNotesList(it)
-            recyclerView.adapter = adapter
-            adapter.notifyDataSetChanged()
         })
     }
 
-    private fun getNotesList():MutableList<Note> {
-
-        val newList = appDb.noteDao().getAll()
-        return newList
-
+    private suspend fun deleteNoteFromDb(noteToBeDeleted: Note) {
+        appDb.noteDao().delete(noteToBeDeleted)
+        var list: MutableList<Note>
+        GlobalScope.launch {
+            list = getNotesList()
+            withContext(Dispatchers.Main){
+                notesViewModel.dbNotesList.value = list
+            }
+        }
     }
+
+
+    private fun getNotesList(): MutableList<Note> {
+        return appDb.noteDao().getAll()
+    }
+
+
 
 }
