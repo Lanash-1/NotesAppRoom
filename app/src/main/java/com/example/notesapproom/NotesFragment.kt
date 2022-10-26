@@ -6,10 +6,9 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
+import android.view.*
+import android.widget.Toast
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.commit
@@ -22,6 +21,7 @@ import com.example.notesapproom.data.Note
 import com.example.notesapproom.data.NoteDatabase
 import com.example.notesapproom.interfaces.OnNoteOptionsClickListener
 import com.example.notesapproom.viewModel.NotesViewModel
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -35,6 +35,10 @@ class NotesFragment : Fragment() {
 
     private lateinit var appDb: NoteDatabase
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -42,6 +46,30 @@ class NotesFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_notes, container, false)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.note_list_menu, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId){
+            R.id.favorites -> {
+                Toast.makeText(context, "Favorites list", Toast.LENGTH_SHORT).show()
+            }
+            R.id.sort -> {
+                openSortOptions()
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    private fun openSortOptions() {
+        val dialog = BottomSheetDialog(requireContext())
+        val view = layoutInflater.inflate(R.layout.sort_note_bottom_sheet, null)
+        dialog.setCancelable(true)
+        dialog.setContentView(view)
+        dialog.show()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -86,7 +114,7 @@ class NotesFragment : Fragment() {
             }
 
             override fun addToFavorite(position: Int) {
-                Log.d(null, "add to favorie")
+                Log.d(null, "add to favorite")
             }
 
             override fun shareNote(position: Int) {

@@ -1,7 +1,6 @@
 package com.example.notesapproom.adapter
 
 import android.graphics.Color
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.ViewGroup
@@ -22,7 +21,6 @@ class NotesListAdapter : RecyclerView.Adapter<NotesListAdapter.NotesListViewHold
     private lateinit var noteOptionsClickListener: OnNoteOptionsClickListener
 
     private var notesList = listOf<Note>()
-
 
     fun setNotesList(newNotesList: List<Note>){
         val notesDiffUtil = NotesDiffUtils(notesList, newNotesList)

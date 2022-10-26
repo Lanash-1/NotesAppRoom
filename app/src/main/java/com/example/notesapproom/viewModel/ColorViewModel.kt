@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 class ColorViewModel: ViewModel() {
 
     val colors = listOf(
-        "#FFFFFF",
         "#ABDEE6",
         "#FFFFB5",
         "#FFCCB6",

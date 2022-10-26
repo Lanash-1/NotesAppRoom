@@ -8,9 +8,7 @@ class NotesViewModel: ViewModel() {
 
     var note: Note = Note(0, "", "", "#DDDDDD")
 
-
     var dbNotesList = MutableLiveData<MutableList<Note>>()
-
 
     var noteId: Int = 0
     var noteTitle: String = ""

@@ -1,27 +1,31 @@
 package com.example.notesapproom
 
+import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.*
+import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.commit
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.notesapproom.adapter.ColorAdapter
-import com.example.notesapproom.interfaces.OnItemClickListener
 import com.example.notesapproom.data.Note
 import com.example.notesapproom.data.NoteDatabase
+import com.example.notesapproom.interfaces.OnItemClickListener
 import com.example.notesapproom.viewModel.ColorViewModel
 import com.example.notesapproom.viewModel.NotesViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+
 
 class NewNoteFragment : Fragment() {
 
@@ -30,6 +34,7 @@ class NewNoteFragment : Fragment() {
 
     private lateinit var noteText: EditText
     private lateinit var titleText: EditText
+    private lateinit var noteLayout: ConstraintLayout
 
     private lateinit var appDb: NoteDatabase
 
@@ -60,12 +65,15 @@ class NewNoteFragment : Fragment() {
 
         titleText = view.findViewById(R.id.titleText)
         noteText = view.findViewById(R.id.noteText)
+        noteLayout = view.findViewById(R.id.noteLayout)
 
-        println("${notesViewModel.note}")
         titleText.setText(notesViewModel.note.title)
         noteText.setText(notesViewModel.note.content)
         setNoteColor(notesViewModel.note.color)
 
+        noteLayout.setOnClickListener {
+            noteText.requestFocus()
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -135,7 +143,6 @@ class NewNoteFragment : Fragment() {
             dialog.dismiss()
         }
     }
-
 
     private fun setNoteColor(color: String) {
         notesViewModel.noteColor = color

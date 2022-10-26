@@ -19,6 +19,7 @@ abstract class NoteDatabase: RoomDatabase() {
             if(tempInstance != null){
                 return tempInstance
             }
+            // synchronized - can be accessed from only one thread
             synchronized(this){
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
@@ -30,5 +31,4 @@ abstract class NoteDatabase: RoomDatabase() {
             }
         }
     }
-
 }
