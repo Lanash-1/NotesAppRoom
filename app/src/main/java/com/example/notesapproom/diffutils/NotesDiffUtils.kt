@@ -1,7 +1,7 @@
 package com.example.notesapproom.diffutils
 
 import androidx.recyclerview.widget.DiffUtil
-import com.example.notesapproom.data.Note
+import com.example.notesapproom.entity.Note
 
 class NotesDiffUtils(
     private val oldNotesList: List<Note>,

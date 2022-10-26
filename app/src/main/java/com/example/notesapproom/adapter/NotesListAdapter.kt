@@ -8,7 +8,7 @@ import android.widget.PopupMenu
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.notesapproom.R
-import com.example.notesapproom.data.Note
+import com.example.notesapproom.entity.Note
 import com.example.notesapproom.databinding.ItemNoteBinding
 import com.example.notesapproom.diffutils.NotesDiffUtils
 import com.example.notesapproom.interfaces.OnItemClickListener

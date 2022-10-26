@@ -1,23 +1,20 @@
 package com.example.notesapproom
 
-import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.*
-import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.commit
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.notesapproom.adapter.ColorAdapter
-import com.example.notesapproom.data.Note
+import com.example.notesapproom.entity.Note
 import com.example.notesapproom.data.NoteDatabase
 import com.example.notesapproom.interfaces.OnItemClickListener
 import com.example.notesapproom.viewModel.ColorViewModel
@@ -43,6 +40,13 @@ class NewNoteFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
+        (activity as AppCompatActivity).supportActionBar?.apply {
+            if(notesViewModel.notePosition == -1){
+                title = "Untitled Note"
+            }else{
+                title = notesViewModel.note.title
+            }
+        }
     }
 
     override fun onCreateView(

@@ -2,7 +2,7 @@ package com.example.notesapproom.viewModel
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.notesapproom.data.Note
+import com.example.notesapproom.entity.Note
 
 class NotesViewModel: ViewModel() {
 
@@ -14,7 +14,6 @@ class NotesViewModel: ViewModel() {
     var noteTitle: String = ""
     var noteContent: String = ""
     var noteColor: String = ""
-
 
     var notePosition = -1
 }

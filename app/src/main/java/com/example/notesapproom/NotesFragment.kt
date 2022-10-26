@@ -17,7 +17,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.notesapproom.adapter.NotesListAdapter
 import com.example.notesapproom.interfaces.OnItemClickListener
-import com.example.notesapproom.data.Note
+import com.example.notesapproom.entity.Note
 import com.example.notesapproom.data.NoteDatabase
 import com.example.notesapproom.interfaces.OnNoteOptionsClickListener
 import com.example.notesapproom.viewModel.NotesViewModel
@@ -38,6 +38,7 @@ class NotesFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
+        (activity as AppCompatActivity).supportActionBar?.title = "Notes App"
     }
 
     override fun onCreateView(
