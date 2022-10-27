@@ -13,6 +13,12 @@ class FavoriteNoteViewModel : ViewModel() {
     var note: Note = Note(0, "", "", "#DDDDDD")
 
 
+    var noteId: Int = 0
+    var noteTitle: String = ""
+    var noteContent: String = ""
+    var noteColor: String = ""
+
+
     var dbFavoriteNoteList = mutableListOf<FavoriteNote>()
 
     var favoriteNotes = MutableLiveData<MutableList<Note>>()

@@ -43,7 +43,6 @@ class DbViewModel(
         var list = mutableListOf<Note>()
         for(element in favorites){
             list.add(getFavoriteNote(element.noteId!!))
-            println("NOTE ID: ${element.noteId}")
         }
         return list
     }
@@ -54,14 +53,16 @@ class DbViewModel(
         }
     }
 
-    fun removeNoteFromFavorite(noteToBeRemoved: FavoriteNote){
-        GlobalScope.launch {
-            appDb.favoriteNoteDao().removeFromFavorites(noteToBeRemoved)
-        }
+    suspend fun removeNoteFromFavorite(noteToBeRemoved: FavoriteNote){
+        appDb.favoriteNoteDao().removeFromFavorites(noteToBeRemoved)
     }
 
     fun getfavoriteNotesIdList(): MutableList<FavoriteNote> {
         return appDb.favoriteNoteDao().getFavoriteNotes()
+    }
+
+    suspend fun removeNoteFromFavoritesList(id: Int) {
+        appDb.favoriteNoteDao().removeNoteFromFavorite(id)
     }
 
 

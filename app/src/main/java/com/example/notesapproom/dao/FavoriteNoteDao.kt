@@ -15,4 +15,7 @@ interface FavoriteNoteDao {
     @Delete
     suspend fun removeFromFavorites(favoriteNote: FavoriteNote)
 
+    @Query("DELETE FROM favorite_notes_table WHERE note_id LIKE :id")
+    suspend fun removeNoteFromFavorite(id: Int)
+
 }

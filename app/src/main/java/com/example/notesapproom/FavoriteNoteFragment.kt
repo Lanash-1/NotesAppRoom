@@ -4,6 +4,7 @@ import android.content.res.Configuration
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.appcompat.app.AppCompatActivity
@@ -36,25 +37,28 @@ class FavoriteNoteFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
-        (activity as AppCompatActivity).supportActionBar?.apply {
-            title = "Favorites"
-            setDisplayHomeAsUpEnabled(true)
-        }
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        (activity as AppCompatActivity).supportActionBar?.apply {
+            title = "Favorites"
+            setBackgroundDrawable(ColorDrawable(Color.parseColor("#ffffff")))
+            setDisplayHomeAsUpEnabled(true)
+        }
         return inflater.inflate(R.layout.fragment_favorite_note, container, false)
     }
+
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
             android.R.id.home -> {
                 parentFragmentManager.commit {
-                    replace(R.id.favorite_note_fragment, NotesFragment())
-                    addToBackStack(null)
+                    replace(R.id.notesFragment, NotesFragment())
+                    parentFragmentManager.popBackStack()
+                    setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
                 }
             }
         }
@@ -64,22 +68,18 @@ class FavoriteNoteFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        (activity as AppCompatActivity).supportActionBar?.apply {
-            setBackgroundDrawable(ColorDrawable(Color.parseColor("#ffffff")))
-        }
 
         val recyclerView = view.findViewById<RecyclerView>(R.id.favoriteNotes_recyclerView)
 
 
-        // note item click
         adapter.setOnItemClickListener(object : OnItemClickListener {
+
             override fun onItemClick(position: Int) {
-//                favoriteNoteViewModel.note = favoriteNoteViewModel.dbNotesList.value!![position]
-//                favoriteNoteViewModel.note = dbViewModel.getFavoriteNote(favoriteNoteViewModel.dbFavoriteNoteList[position].noteId!!)
+
                 favoriteNoteViewModel.note = favoriteNoteViewModel.favoriteNotes.value!![position]
                 favoriteNoteViewModel.notePosition = position
                 parentFragmentManager.commit {
-                    replace(R.id.favorite_note_fragment, NewNoteFragment())
+                    replace(R.id.notesFragment, NewNoteFragment())
                     addToBackStack(null)
                     setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                 }
@@ -88,13 +88,10 @@ class FavoriteNoteFragment : Fragment() {
 
         adapter.setOnFavoriteNoteOptionsClickListener(object : OnFavoriteNoteClickListener{
             override fun removeFromFavorite(position: Int) {
-//                val noteToBeRemoved = favoriteNoteViewModel.dbFavoriteNoteList[position]
-                val noteToBeRemoved = favoriteNoteViewModel.favoriteNotes.value!![position]
-                val n = favoriteNoteViewModel.dbFavoriteNoteList[position]
+                val noteToBeRemoved = favoriteNoteViewModel.dbFavoriteNoteList[position]
 
                 GlobalScope.launch {
-//                    dbViewModel.removeNoteFromFavorite(dbViewModel.getFavoriteNote(noteToBeRemoved.noteId!!))
-                    removeNoteFromFavorites(n)
+                    removeNoteFromFavorites(noteToBeRemoved)
                 }
             }
         })
@@ -106,10 +103,6 @@ class FavoriteNoteFragment : Fragment() {
         }else{
             recyclerView.layoutManager = GridLayoutManager(context, 4)
         }
-
-//        GlobalScope.launch{
-//            favoriteNoteViewModel.dbFavoriteNoteList = dbViewModel.getfavoriteNotesIdList()
-//        }
 
         GlobalScope.launch {
             var fList: MutableList<FavoriteNote>
@@ -138,29 +131,26 @@ class FavoriteNoteFragment : Fragment() {
         })
     }
 
-    private suspend fun removeNoteFromFavorites(n: FavoriteNote) {
-        dbViewModel.removeNoteFromFavorite(n)
-        GlobalScope.launch {
-            var fList: MutableList<FavoriteNote>
-            val firstJob = launch {
-                fList = dbViewModel.getfavoriteNotesIdList()
-                withContext(Dispatchers.Main){
-                    favoriteNoteViewModel.dbFavoriteNoteList = fList
-                }
-            }
-            firstJob.join()
-            var list: MutableList<Note>
-            val job = launch {
-                list=dbViewModel.getFavoriteNotes(favoriteNoteViewModel.dbFavoriteNoteList)
-                withContext(Dispatchers.Main){
-                    favoriteNoteViewModel.favoriteNotes.value= list
-                }
-            }
-            job.join()
+    private suspend fun removeNoteFromFavorites(note: FavoriteNote) {
+
+        dbViewModel.removeNoteFromFavorite(note)
+
+        var favoriteList: MutableList<FavoriteNote>
+        val job = GlobalScope.launch {
+            favoriteList = dbViewModel.getfavoriteNotesIdList()
             withContext(Dispatchers.Main){
-                favoriteNoteViewModel.favoriteNotes.value!!.let { adapter.setNotesList(it) }
+                favoriteNoteViewModel.dbFavoriteNoteList = favoriteList
             }
         }
-    }
+        job.join()
+        var favoriteNoteList: MutableList<Note>
+        val secondJob = GlobalScope.launch {
+            favoriteNoteList = dbViewModel.getFavoriteNotes(favoriteNoteViewModel.dbFavoriteNoteList)
+            withContext(Dispatchers.Main){
+                favoriteNoteViewModel.favoriteNotes.value = favoriteNoteList
+            }
+        }
+    secondJob.join()
 
+    }
 }

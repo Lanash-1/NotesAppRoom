@@ -20,6 +20,7 @@ import com.example.notesapproom.entity.Note
 import com.example.notesapproom.data.NoteDatabase
 import com.example.notesapproom.interfaces.OnNoteOptionsClickListener
 import com.example.notesapproom.viewModel.DbViewModel
+import com.example.notesapproom.viewModel.FavoriteNoteViewModel
 import com.example.notesapproom.viewModel.NotesViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -33,19 +34,26 @@ class NotesFragment : Fragment() {
     private var adapter = NotesListAdapter()
     private val notesViewModel: NotesViewModel by activityViewModels()
     private val dbViewModel: DbViewModel by activityViewModels()
+    private val favoriteNoteViewModel: FavoriteNoteViewModel by activityViewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
-        (activity as AppCompatActivity).supportActionBar?.title = "Notes App"
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
+
+        (activity as AppCompatActivity).supportActionBar?.apply {
+            setBackgroundDrawable(ColorDrawable(Color.parseColor("#ffffff")))
+            title = "Notes App"
+            setDisplayHomeAsUpEnabled(false)
+        }
+
         return inflater.inflate(R.layout.fragment_notes, container, false)
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -55,10 +63,11 @@ class NotesFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
             R.id.favorites -> {
-//                parentFragmentManager.commit {
-//                    replace(R.id.notesFragment, FavoriteNoteFragment())
-//                    addToBackStack(null)
-//                }
+                parentFragmentManager.commit {
+                    replace(R.id.notesFragment, FavoriteNoteFragment())
+                    addToBackStack(null)
+                    setTransition(TRANSIT_FRAGMENT_OPEN)
+                }
             }
             R.id.sort -> {
                 openSortOptions()
@@ -78,14 +87,12 @@ class NotesFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        (activity as AppCompatActivity).supportActionBar?.apply {
-            setDisplayHomeAsUpEnabled(false)
-            setBackgroundDrawable(ColorDrawable(Color.parseColor("#ffffff")))
-        }
+        favoriteNoteViewModel.notePosition = -1
 
         val recyclerView = view.findViewById<RecyclerView>(R.id.notes_recyclerView)
 
         val fab = view.findViewById<FloatingActionButton>(R.id.create_note_fab)
+
 
         fab.setOnClickListener {
             notesViewModel.note = Note(0, "", "", "#EEEEEE")
@@ -118,22 +125,22 @@ class NotesFragment : Fragment() {
             }
 
             override fun addToFavorite(position: Int) {
-//                val noteToBeAddedToFavorite = notesViewModel.dbNotesList.value!![position]
-//                GlobalScope.launch {
-//                    dbViewModel.addNoteToFavorite(noteToBeAddedToFavorite)
-//                }
+                val noteToBeAddedToFavorite = notesViewModel.dbNotesList.value!![position]
+                GlobalScope.launch {
+                    dbViewModel.addNoteToFavorite(noteToBeAddedToFavorite)
+                }
             }
 
         })
 
         recyclerView.adapter = adapter
 
+
         if(activity?.resources?.configuration?.orientation == Configuration.ORIENTATION_PORTRAIT){
             recyclerView.layoutManager = GridLayoutManager(context, 2)
         }else{
             recyclerView.layoutManager = GridLayoutManager(context, 4)
         }
-
 
         GlobalScope.launch {
             var list: MutableList<Note>
@@ -155,6 +162,7 @@ class NotesFragment : Fragment() {
     }
 
     private suspend fun deleteNoteFromDb(noteToBeDeleted: Note) {
+        dbViewModel.removeNoteFromFavoritesList(noteToBeDeleted.id!!)
         dbViewModel.deleteNoteFromDB(noteToBeDeleted)
         var list: MutableList<Note>
         GlobalScope.launch {

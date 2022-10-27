@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.ViewGroup
 import android.widget.PopupMenu
+import android.widget.Toast
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.notesapproom.R
@@ -41,6 +42,10 @@ class NotesListAdapter : RecyclerView.Adapter<NotesListAdapter.NotesListViewHold
         init {
             itemView.setOnClickListener {
                 listener.onItemClick(absoluteAdapterPosition)
+            }
+            itemView.setOnLongClickListener{
+                Toast.makeText(itemView.context, "long press", Toast.LENGTH_SHORT).show()
+                true
             }
             binding.moreBtn.setOnClickListener{
                 val popupMenu = PopupMenu(binding.moreBtn.context, it)
