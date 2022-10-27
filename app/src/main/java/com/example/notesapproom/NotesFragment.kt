@@ -5,11 +5,10 @@ import android.content.res.Configuration
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.util.Log
 import android.view.*
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.FragmentTransaction.TRANSIT_FRAGMENT_OPEN
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.commit
 import androidx.lifecycle.Observer
@@ -20,6 +19,7 @@ import com.example.notesapproom.interfaces.OnItemClickListener
 import com.example.notesapproom.entity.Note
 import com.example.notesapproom.data.NoteDatabase
 import com.example.notesapproom.interfaces.OnNoteOptionsClickListener
+import com.example.notesapproom.viewModel.DbViewModel
 import com.example.notesapproom.viewModel.NotesViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -32,8 +32,7 @@ class NotesFragment : Fragment() {
 
     private var adapter = NotesListAdapter()
     private val notesViewModel: NotesViewModel by activityViewModels()
-
-    private lateinit var appDb: NoteDatabase
+    private val dbViewModel: DbViewModel by activityViewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,7 +55,10 @@ class NotesFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
             R.id.favorites -> {
-                Toast.makeText(context, "Favorites list", Toast.LENGTH_SHORT).show()
+//                parentFragmentManager.commit {
+//                    replace(R.id.notesFragment, FavoriteNoteFragment())
+//                    addToBackStack(null)
+//                }
             }
             R.id.sort -> {
                 openSortOptions()
@@ -75,7 +77,6 @@ class NotesFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        appDb = NoteDatabase.getDatabase(requireContext())
 
         (activity as AppCompatActivity).supportActionBar?.apply {
             setDisplayHomeAsUpEnabled(false)
@@ -92,6 +93,7 @@ class NotesFragment : Fragment() {
             parentFragmentManager.commit {
                 replace(R.id.notesFragment, NewNoteFragment())
                 addToBackStack(null)
+                setTransition(TRANSIT_FRAGMENT_OPEN)
             }
         }
 
@@ -102,6 +104,7 @@ class NotesFragment : Fragment() {
                 parentFragmentManager.commit {
                     replace(R.id.notesFragment, NewNoteFragment())
                     addToBackStack(null)
+                    setTransition(TRANSIT_FRAGMENT_OPEN)
                 }
             }
         })
@@ -115,12 +118,12 @@ class NotesFragment : Fragment() {
             }
 
             override fun addToFavorite(position: Int) {
-                Log.d(null, "add to favorite")
+//                val noteToBeAddedToFavorite = notesViewModel.dbNotesList.value!![position]
+//                GlobalScope.launch {
+//                    dbViewModel.addNoteToFavorite(noteToBeAddedToFavorite)
+//                }
             }
 
-            override fun shareNote(position: Int) {
-                Log.d(null, "share note")
-            }
         })
 
         recyclerView.adapter = adapter
@@ -135,7 +138,7 @@ class NotesFragment : Fragment() {
         GlobalScope.launch {
             var list: MutableList<Note>
             val job= launch {
-                list=getNotesList()
+                list=dbViewModel.getNotesList()
                 withContext(Dispatchers.Main){
                     notesViewModel.dbNotesList.value=list
                 }
@@ -152,21 +155,14 @@ class NotesFragment : Fragment() {
     }
 
     private suspend fun deleteNoteFromDb(noteToBeDeleted: Note) {
-        appDb.noteDao().delete(noteToBeDeleted)
+        dbViewModel.deleteNoteFromDB(noteToBeDeleted)
         var list: MutableList<Note>
         GlobalScope.launch {
-            list = getNotesList()
+            list = dbViewModel.getNotesList()
             withContext(Dispatchers.Main){
                 notesViewModel.dbNotesList.value = list
             }
         }
     }
-
-
-    private fun getNotesList(): MutableList<Note> {
-        return appDb.noteDao().getAll()
-    }
-
-
 
 }

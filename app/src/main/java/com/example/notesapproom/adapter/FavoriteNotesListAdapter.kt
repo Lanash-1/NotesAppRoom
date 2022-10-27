@@ -8,17 +8,17 @@ import android.widget.PopupMenu
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.notesapproom.R
-import com.example.notesapproom.entity.Note
 import com.example.notesapproom.databinding.ItemNoteBinding
 import com.example.notesapproom.diffutils.NotesDiffUtils
+import com.example.notesapproom.entity.Note
+import com.example.notesapproom.interfaces.OnFavoriteNoteClickListener
 import com.example.notesapproom.interfaces.OnItemClickListener
-import com.example.notesapproom.interfaces.OnNoteOptionsClickListener
 
-class NotesListAdapter : RecyclerView.Adapter<NotesListAdapter.NotesListViewHolder>()
-{
+class FavoriteNotesListAdapter: RecyclerView.Adapter<FavoriteNotesListAdapter.FavoriteNotesListViewHolder>() {
+
     private lateinit var itemClickListener: OnItemClickListener
 
-    private lateinit var noteOptionsClickListener: OnNoteOptionsClickListener
+    private lateinit var favoriteNoteOptionsClickListener: OnFavoriteNoteClickListener
 
     private var notesList = listOf<Note>()
 
@@ -33,47 +33,44 @@ class NotesListAdapter : RecyclerView.Adapter<NotesListAdapter.NotesListViewHold
         this.itemClickListener = itemClickListener
     }
 
-    fun setOnNoteOptionsClickListener(noteOptionsClickListener: OnNoteOptionsClickListener){
-        this.noteOptionsClickListener = noteOptionsClickListener
+    fun setOnFavoriteNoteOptionsClickListener(favoriteNoteClickListener: OnFavoriteNoteClickListener){
+        this.favoriteNoteOptionsClickListener = favoriteNoteClickListener
     }
 
-    inner class NotesListViewHolder(val binding: ItemNoteBinding, listener: OnItemClickListener): RecyclerView.ViewHolder(binding.root){
+
+    inner class FavoriteNotesListViewHolder(val binding: ItemNoteBinding, listener: OnItemClickListener): RecyclerView.ViewHolder(binding.root) {
         init {
-            itemView.setOnClickListener {
+            itemView.setOnClickListener{
                 listener.onItemClick(absoluteAdapterPosition)
             }
-            binding.moreBtn.setOnClickListener{
+
+            binding.moreBtn.setOnClickListener {
                 val popupMenu = PopupMenu(binding.moreBtn.context, it)
-                popupMenu.inflate(R.menu.note_menu)
+                popupMenu.inflate(R.menu.favorite_note_menu)
 
                 popupMenu.setOnMenuItemClickListener(object: PopupMenu.OnMenuItemClickListener{
                     override fun onMenuItemClick(item: MenuItem): Boolean {
                         when(item.itemId){
-                            R.id.delete -> {
-                                noteOptionsClickListener.deleteNote(absoluteAdapterPosition)
-                                return true
-                            }
-                            R.id.favorite -> {
-                                noteOptionsClickListener.addToFavorite(absoluteAdapterPosition)
+                            R.id.removeFromFavorite -> {
+                                favoriteNoteOptionsClickListener.removeFromFavorite(absoluteAdapterPosition)
                                 return true
                             }
                         }
                         return false
                     }
-
                 })
                 popupMenu.show()
             }
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NotesListViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FavoriteNotesListViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
         val binding = ItemNoteBinding.inflate(layoutInflater, parent, false)
-        return NotesListViewHolder(binding, itemClickListener)
+        return FavoriteNotesListViewHolder(binding, itemClickListener)
     }
 
-    override fun onBindViewHolder(holder: NotesListViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: FavoriteNotesListViewHolder, position: Int) {
         val note = notesList[position]
         holder.binding.apply {
             titleText.text = note.title
@@ -85,5 +82,4 @@ class NotesListAdapter : RecyclerView.Adapter<NotesListAdapter.NotesListViewHold
     override fun getItemCount(): Int {
         return notesList.size
     }
-
 }

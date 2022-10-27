@@ -18,5 +18,7 @@ interface NoteDao {
     @Query("SELECT * FROM notes_table")
     fun getAll(): MutableList<Note>
 
+    @Query("SELECT * FROM notes_table WHERE id LIKE :id")
+    fun getFavoriteNote(id: Int): Note
 
 }

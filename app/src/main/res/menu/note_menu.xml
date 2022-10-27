@@ -9,8 +9,4 @@
         android:id="@+id/favorite"
         android:title="Add to favorite" />
 
-    <item
-        android:id="@+id/share"
-        android:title="Share" />
-
 </menu>

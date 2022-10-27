@@ -9,6 +9,8 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentTransaction.TRANSIT_FRAGMENT_CLOSE
+import androidx.fragment.app.FragmentTransaction.TRANSIT_FRAGMENT_FADE
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.commit
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -18,6 +20,7 @@ import com.example.notesapproom.entity.Note
 import com.example.notesapproom.data.NoteDatabase
 import com.example.notesapproom.interfaces.OnItemClickListener
 import com.example.notesapproom.viewModel.ColorViewModel
+import com.example.notesapproom.viewModel.DbViewModel
 import com.example.notesapproom.viewModel.NotesViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.coroutines.GlobalScope
@@ -28,12 +31,12 @@ class NewNoteFragment : Fragment() {
 
     private val notesViewModel: NotesViewModel by activityViewModels()
     private val colorViewModel: ColorViewModel by activityViewModels()
+    private val dbViewModel: DbViewModel by activityViewModels()
 
     private lateinit var noteText: EditText
     private lateinit var titleText: EditText
     private lateinit var noteLayout: ConstraintLayout
 
-    private lateinit var appDb: NoteDatabase
 
     private var colorAdapter = ColorAdapter()
 
@@ -41,10 +44,10 @@ class NewNoteFragment : Fragment() {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
         (activity as AppCompatActivity).supportActionBar?.apply {
-            if(notesViewModel.notePosition == -1){
-                title = "Untitled Note"
+            title = if(notesViewModel.notePosition == -1){
+                "Untitled Note"
             }else{
-                title = notesViewModel.note.title
+                notesViewModel.note.title
             }
         }
     }
@@ -59,8 +62,6 @@ class NewNoteFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        appDb = NoteDatabase.getDatabase(requireContext())
 
         (activity as AppCompatActivity).supportActionBar?.apply {
             setBackgroundDrawable(ColorDrawable(Color.parseColor(notesViewModel.note.color)))
@@ -95,7 +96,7 @@ class NewNoteFragment : Fragment() {
             R.id.delete -> {
                 if(notesViewModel.notePosition != -1){
                     GlobalScope.launch {
-                        deleteNoteFromDB(notesViewModel.dbNotesList.value!![notesViewModel.notePosition])
+                        dbViewModel.deleteNoteFromDB(notesViewModel.dbNotesList.value!![notesViewModel.notePosition])
                     }
                 }
                 moveToNotesFragment()
@@ -112,14 +113,14 @@ class NewNoteFragment : Fragment() {
             notesViewModel.noteTitle = titleText.text.toString()
             notesViewModel.noteContent = noteText.text.toString()
             if(notesViewModel.noteTitle.isNotEmpty() || notesViewModel.noteContent.isNotEmpty()){
-                insertNote()
+                dbViewModel.insertNote(notesViewModel.noteTitle, notesViewModel.noteContent, notesViewModel.noteColor)
             }
         }else{
             notesViewModel.noteTitle = titleText.text.toString()
             notesViewModel.noteContent = noteText.text.toString()
             notesViewModel.noteColor = notesViewModel.noteColor
             notesViewModel.noteId = notesViewModel.dbNotesList.value!![notesViewModel.notePosition].id!!
-            updateNoteInDB()
+            dbViewModel.updateNoteInDB(notesViewModel.noteId, notesViewModel.noteTitle, notesViewModel.noteContent, notesViewModel.noteColor)
         }
         moveToNotesFragment()
     }
@@ -156,26 +157,11 @@ class NewNoteFragment : Fragment() {
         (activity as AppCompatActivity).supportActionBar?.setBackgroundDrawable(ColorDrawable(Color.parseColor(color)))
     }
 
-    private suspend fun deleteNoteFromDB(note: Note) {
-        appDb.noteDao().delete(note)
-    }
-
-    private fun updateNoteInDB() {
-        GlobalScope.launch {
-            appDb.noteDao().update(notesViewModel.noteId, notesViewModel.noteTitle, notesViewModel.noteContent, notesViewModel.noteColor)
-        }
-    }
-
-    private fun insertNote() {
-        GlobalScope.launch {
-            appDb.noteDao().insert(Note(null, notesViewModel.noteTitle, notesViewModel.noteContent, notesViewModel.noteColor))
-        }
-    }
-
     private fun moveToNotesFragment(){
         parentFragmentManager.commit {
             replace(R.id.notesFragment, NotesFragment())
             parentFragmentManager.popBackStack()
+            setTransition(TRANSIT_FRAGMENT_CLOSE)
         }
     }
 

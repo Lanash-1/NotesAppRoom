@@ -16,10 +16,12 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
     override fun onBackPressed() {
         super.onBackPressed()
-        supportActionBar?.setBackgroundDrawable(ColorDrawable(Color.parseColor("#ffffff")))
+        supportActionBar?.apply {
+            setBackgroundDrawable(ColorDrawable(Color.parseColor("#ffffff")))
+            title = "Notes App"
+        }
 
     }
 
