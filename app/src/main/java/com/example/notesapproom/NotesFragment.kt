@@ -75,13 +75,13 @@ class NotesFragment : Fragment() {
         return super.onOptionsItemSelected(item)
     }
 
-    private fun openSortOptions() {
-        val dialog = BottomSheetDialog(requireContext())
-        val view = layoutInflater.inflate(R.layout.sort_note_bottom_sheet, null)
-        dialog.setCancelable(true)
-        dialog.setContentView(view)
-        dialog.show()
-    }
+//    private fun openSortOptions() {
+//        val dialog = BottomSheetDialog(requireContext())
+//        val view = layoutInflater.inflate(R.layout.sort_note_bottom_sheet, null)
+//        dialog.setCancelable(true)
+//        dialog.setContentView(view)
+//        dialog.show()
+//    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -127,24 +127,15 @@ class NotesFragment : Fragment() {
                 if(isFavorite){
                     GlobalScope.launch {
                         dbViewModel.removeNoteFromFavoritesList(note.id!!)
-                    println("inside remove")
                     }
                 }else {
-//                    GlobalScope.launch {
                         dbViewModel.addNoteToFavorite(note)
-                        println("inside add")
-//                    }
                 }
-                println("outside condition")
             }
 
             override fun isFavorite(position: Int, onClicked: (Boolean) -> Unit) {
                 val noteToBeChecked = notesViewModel.dbNotesList.value!![position]
-//                return isFavoriteNote(noteToBeChecked)
-                //onClicked(
-                    isFavoriteNote(noteToBeChecked, onClicked)
-                //)
-//                , onClicked: (Boolean) -> Unit
+                isFavoriteNote(noteToBeChecked, onClicked)
             }
 
         })
@@ -177,22 +168,19 @@ class NotesFragment : Fragment() {
         })
     }
 
-    private fun isFavoriteNote(noteToBeChecked: Note, onClicked: (Boolean) -> Unit)
-//    : Boolean
-    {
-//        var isFavorite: Boolean = false
+    private fun isFavoriteNote(noteToBeChecked: Note, onClicked: (Boolean) -> Unit) {
         GlobalScope.launch {
-            val job = launch {
-//                var isFavorite = dbViewModel.isFavoriteNoteAvailable(noteToBeChecked.id!!)
-//                onClicked(isFavorite)
-                onClicked(dbViewModel.isFavoriteNoteAvailable(noteToBeChecked.id!!))
-            }
-            job.join()
+            onClicked(dbViewModel.isFavoriteNoteAvailable(noteToBeChecked.id!!))
+
+//            var favoriteResult: Boolean
+//            val job = launch {
+//                onClicked(dbViewModel.isFavoriteNoteAvailable(noteToBeChecked.id!!))
+//            }
+//            job.join()
 //            withContext(Dispatchers.Main){
 //                favoriteNoteViewModel.isFavorite = isFavorite
 //            }
         }
-//        return favoriteNoteViewModel.isFavorite
     }
 
     private suspend fun deleteNoteFromDb(noteToBeDeleted: Note) {
