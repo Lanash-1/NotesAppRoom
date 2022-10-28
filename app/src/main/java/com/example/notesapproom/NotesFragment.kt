@@ -4,8 +4,10 @@ package com.example.notesapproom
 import android.content.res.Configuration
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.os.Build
 import android.os.Bundle
 import android.view.*
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction.TRANSIT_FRAGMENT_OPEN
@@ -27,6 +29,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.text.SimpleDateFormat
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.util.*
 
 class NotesFragment : Fragment() {
 
@@ -117,7 +123,15 @@ class NotesFragment : Fragment() {
         val fab = view.findViewById<FloatingActionButton>(R.id.create_note_fab)
 
         fab.setOnClickListener {
-            notesViewModel.note = Note(0, "", "", colorViewModel.colors.random())
+            val time = Calendar.getInstance().time
+            val timeFormatter = SimpleDateFormat("HH:mm:ss")
+            val dateFormatter = SimpleDateFormat("yyyy-MM-dd")
+            val currentTime = timeFormatter.format(time)
+            val currentDate = dateFormatter.format(time)
+
+            println("DATE: $currentDate")
+            println("TIME: $currentTime")
+            notesViewModel.note = Note(0, "", "", colorViewModel.colors.random(), currentDate, currentTime.toString(), "", "")
             notesViewModel.notePosition = -1
             parentFragmentManager.commit {
                 replace(R.id.notesFragment, NewNoteFragment())
@@ -128,6 +142,8 @@ class NotesFragment : Fragment() {
 
         adapter.setOnItemClickListener(object : OnItemClickListener {
             override fun onItemClick(position: Int) {
+
+
                 notesViewModel.note = notesViewModel.dbNotesList.value!![position]
                 notesViewModel.notePosition = position
                 parentFragmentManager.commit {

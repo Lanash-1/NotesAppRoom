@@ -81,13 +81,11 @@ class NewNoteFragment : Fragment() {
             titleText.setText(favoriteNoteViewModel.note.title)
             noteText.setText(favoriteNoteViewModel.note.content)
             setNoteColor(favoriteNoteViewModel.note.color)
-        }else{
+        }else {
             titleText.setText(notesViewModel.note.title)
             noteText.setText(notesViewModel.note.content)
             setNoteColor(notesViewModel.note.color)
         }
-
-
 
         noteLayout.setOnClickListener {
             noteText.requestFocus()
