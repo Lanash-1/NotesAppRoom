@@ -8,10 +8,10 @@
         app:showAsAction="always"
         android:icon="@drawable/ic_baseline_favorite_24" />
 
-    <item
-        android:title="sort"
-        android:id="@+id/sort"
-        app:showAsAction="always"
-        android:icon="@drawable/ic_baseline_sort_24" />
+<!--    <item-->
+<!--        android:title="sort"-->
+<!--        android:id="@+id/sort"-->
+<!--        app:showAsAction="always"-->
+<!--        android:icon="@drawable/ic_baseline_sort_24" />-->
 
 </menu>

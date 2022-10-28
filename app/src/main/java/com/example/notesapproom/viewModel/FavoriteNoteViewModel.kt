@@ -23,4 +23,6 @@ class FavoriteNoteViewModel : ViewModel() {
 
     var favoriteNotes = MutableLiveData<MutableList<Note>>()
 
+    var isFavorite: Boolean = false
+
 }

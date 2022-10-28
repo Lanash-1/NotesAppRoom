@@ -6,8 +6,10 @@ import com.example.notesapproom.dao.FavoriteNoteDao
 import com.example.notesapproom.data.NoteDatabase
 import com.example.notesapproom.entity.FavoriteNote
 import com.example.notesapproom.entity.Note
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class DbViewModel(
     application: Application
@@ -57,12 +59,18 @@ class DbViewModel(
         appDb.favoriteNoteDao().removeFromFavorites(noteToBeRemoved)
     }
 
-    fun getfavoriteNotesIdList(): MutableList<FavoriteNote> {
+    fun getFavoriteNotesIdList(): MutableList<FavoriteNote> {
         return appDb.favoriteNoteDao().getFavoriteNotes()
     }
 
-    suspend fun removeNoteFromFavoritesList(id: Int) {
+    fun removeNoteFromFavoritesList(id: Int) {
         appDb.favoriteNoteDao().removeNoteFromFavorite(id)
+    }
+
+    suspend fun isFavoriteNoteAvailable(id: Int): Boolean{
+        return withContext(Dispatchers.IO){
+            appDb.favoriteNoteDao().isNoteAvailable(id).size != 0
+        }
     }
 
 

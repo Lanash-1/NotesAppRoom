@@ -4,7 +4,6 @@ import android.content.res.Configuration
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.appcompat.app.AppCompatActivity
@@ -107,7 +106,7 @@ class FavoriteNoteFragment : Fragment() {
         GlobalScope.launch {
             var fList: MutableList<FavoriteNote>
             val firstJob = launch {
-                fList = dbViewModel.getfavoriteNotesIdList()
+                fList = dbViewModel.getFavoriteNotesIdList()
                 withContext(Dispatchers.Main){
                     favoriteNoteViewModel.dbFavoriteNoteList = fList
                 }
@@ -137,7 +136,7 @@ class FavoriteNoteFragment : Fragment() {
 
         var favoriteList: MutableList<FavoriteNote>
         val job = GlobalScope.launch {
-            favoriteList = dbViewModel.getfavoriteNotesIdList()
+            favoriteList = dbViewModel.getFavoriteNotesIdList()
             withContext(Dispatchers.Main){
                 favoriteNoteViewModel.dbFavoriteNoteList = favoriteList
             }

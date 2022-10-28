@@ -16,6 +16,9 @@ interface FavoriteNoteDao {
     suspend fun removeFromFavorites(favoriteNote: FavoriteNote)
 
     @Query("DELETE FROM favorite_notes_table WHERE note_id LIKE :id")
-    suspend fun removeNoteFromFavorite(id: Int)
+    fun removeNoteFromFavorite(id: Int)
+
+    @Query("SELECT * FROM favorite_notes_table WHERE note_id LIKE :id")
+    fun isNoteAvailable(id: Int): MutableList<FavoriteNote>
 
 }

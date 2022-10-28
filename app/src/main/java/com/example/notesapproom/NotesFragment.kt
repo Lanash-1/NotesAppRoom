@@ -17,7 +17,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.notesapproom.adapter.NotesListAdapter
 import com.example.notesapproom.interfaces.OnItemClickListener
 import com.example.notesapproom.entity.Note
-import com.example.notesapproom.data.NoteDatabase
 import com.example.notesapproom.interfaces.OnNoteOptionsClickListener
 import com.example.notesapproom.viewModel.DbViewModel
 import com.example.notesapproom.viewModel.FavoriteNoteViewModel
@@ -69,9 +68,9 @@ class NotesFragment : Fragment() {
                     setTransition(TRANSIT_FRAGMENT_OPEN)
                 }
             }
-            R.id.sort -> {
-                openSortOptions()
-            }
+//            R.id.sort -> {
+//                openSortOptions()
+//            }
         }
         return super.onOptionsItemSelected(item)
     }
@@ -92,7 +91,6 @@ class NotesFragment : Fragment() {
         val recyclerView = view.findViewById<RecyclerView>(R.id.notes_recyclerView)
 
         val fab = view.findViewById<FloatingActionButton>(R.id.create_note_fab)
-
 
         fab.setOnClickListener {
             notesViewModel.note = Note(0, "", "", "#EEEEEE")
@@ -124,11 +122,29 @@ class NotesFragment : Fragment() {
                 }
             }
 
-            override fun addToFavorite(position: Int) {
-                val noteToBeAddedToFavorite = notesViewModel.dbNotesList.value!![position]
-                GlobalScope.launch {
-                    dbViewModel.addNoteToFavorite(noteToBeAddedToFavorite)
+            override fun addOrRemoveFavorite(position: Int, isFavorite: Boolean) {
+                val note = notesViewModel.dbNotesList.value!![position]
+                if(isFavorite){
+                    GlobalScope.launch {
+                        dbViewModel.removeNoteFromFavoritesList(note.id!!)
+                    println("inside remove")
+                    }
+                }else {
+//                    GlobalScope.launch {
+                        dbViewModel.addNoteToFavorite(note)
+                        println("inside add")
+//                    }
                 }
+                println("outside condition")
+            }
+
+            override fun isFavorite(position: Int, onClicked: (Boolean) -> Unit) {
+                val noteToBeChecked = notesViewModel.dbNotesList.value!![position]
+//                return isFavoriteNote(noteToBeChecked)
+                //onClicked(
+                    isFavoriteNote(noteToBeChecked, onClicked)
+                //)
+//                , onClicked: (Boolean) -> Unit
             }
 
         })
@@ -159,6 +175,24 @@ class NotesFragment : Fragment() {
         notesViewModel.dbNotesList.observe(viewLifecycleOwner, Observer{
             adapter.setNotesList(it)
         })
+    }
+
+    private fun isFavoriteNote(noteToBeChecked: Note, onClicked: (Boolean) -> Unit)
+//    : Boolean
+    {
+//        var isFavorite: Boolean = false
+        GlobalScope.launch {
+            val job = launch {
+//                var isFavorite = dbViewModel.isFavoriteNoteAvailable(noteToBeChecked.id!!)
+//                onClicked(isFavorite)
+                onClicked(dbViewModel.isFavoriteNoteAvailable(noteToBeChecked.id!!))
+            }
+            job.join()
+//            withContext(Dispatchers.Main){
+//                favoriteNoteViewModel.isFavorite = isFavorite
+//            }
+        }
+//        return favoriteNoteViewModel.isFavorite
     }
 
     private suspend fun deleteNoteFromDb(noteToBeDeleted: Note) {

@@ -47,9 +47,27 @@ class NotesListAdapter : RecyclerView.Adapter<NotesListAdapter.NotesListViewHold
                 Toast.makeText(itemView.context, "long press", Toast.LENGTH_SHORT).show()
                 true
             }
+
             binding.moreBtn.setOnClickListener{
                 val popupMenu = PopupMenu(binding.moreBtn.context, it)
-                popupMenu.inflate(R.menu.note_menu)
+
+
+                noteOptionsClickListener.isFavorite(absoluteAdapterPosition){ isFavorite ->
+                    if(isFavorite)
+                        popupMenu.inflate(R.menu.isfavorite_note_menu)
+                    else
+                        popupMenu.inflate(R.menu.note_menu)
+                }
+
+//                if(noteOptionsClickListener.isFavorite(absoluteAdapterPosition)){
+//                    println("inflating if")
+//                    popupMenu.inflate(R.menu.isfavorite_note_menu)
+//                }else{
+//                    println("Inflating else")
+//                    popupMenu.inflate(R.menu.note_menu)
+//                }
+
+//                popupMenu.inflate(R.menu.note_menu)
 
                 popupMenu.setOnMenuItemClickListener(object: PopupMenu.OnMenuItemClickListener{
                     override fun onMenuItemClick(item: MenuItem): Boolean {
@@ -58,8 +76,12 @@ class NotesListAdapter : RecyclerView.Adapter<NotesListAdapter.NotesListViewHold
                                 noteOptionsClickListener.deleteNote(absoluteAdapterPosition)
                                 return true
                             }
-                            R.id.favorite -> {
-                                noteOptionsClickListener.addToFavorite(absoluteAdapterPosition)
+                            R.id.addFavorite -> {
+                                noteOptionsClickListener.addOrRemoveFavorite(absoluteAdapterPosition, false)
+                                return true
+                            }
+                            R.id.removeFavorite -> {
+                                noteOptionsClickListener.addOrRemoveFavorite(absoluteAdapterPosition, true)
                                 return true
                             }
                         }
