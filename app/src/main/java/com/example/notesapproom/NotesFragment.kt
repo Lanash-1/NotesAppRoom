@@ -6,8 +6,8 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.*
-import androidx.fragment.app.Fragment
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction.TRANSIT_FRAGMENT_OPEN
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.commit
@@ -15,13 +15,13 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.notesapproom.adapter.NotesListAdapter
-import com.example.notesapproom.interfaces.OnItemClickListener
 import com.example.notesapproom.entity.Note
+import com.example.notesapproom.interfaces.OnItemClickListener
 import com.example.notesapproom.interfaces.OnNoteOptionsClickListener
+import com.example.notesapproom.viewModel.ColorViewModel
 import com.example.notesapproom.viewModel.DbViewModel
 import com.example.notesapproom.viewModel.FavoriteNoteViewModel
 import com.example.notesapproom.viewModel.NotesViewModel
-import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -34,10 +34,20 @@ class NotesFragment : Fragment() {
     private val notesViewModel: NotesViewModel by activityViewModels()
     private val dbViewModel: DbViewModel by activityViewModels()
     private val favoriteNoteViewModel: FavoriteNoteViewModel by activityViewModels()
+    private val colorViewModel: ColorViewModel by activityViewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
+    }
+
+
+    private fun setActionBarProperties(color: String){
+        (activity as AppCompatActivity).supportActionBar?.apply {
+            setBackgroundDrawable(ColorDrawable(Color.parseColor(color)))
+            title = "Notes App"
+            setDisplayHomeAsUpEnabled(false)
+        }
     }
 
     override fun onCreateView(
@@ -45,11 +55,25 @@ class NotesFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
 
-        (activity as AppCompatActivity).supportActionBar?.apply {
-            setBackgroundDrawable(ColorDrawable(Color.parseColor("#ffffff")))
-            title = "Notes App"
-            setDisplayHomeAsUpEnabled(false)
+        when (requireContext().resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) {
+            Configuration.UI_MODE_NIGHT_YES -> {
+                setActionBarProperties("#000000")
+            }
+            Configuration.UI_MODE_NIGHT_NO -> {
+                setActionBarProperties("#ffffff")
+            }
+            Configuration.UI_MODE_NIGHT_UNDEFINED -> {
+                setActionBarProperties("#ffffff")
+            }
         }
+
+
+
+//        (activity as AppCompatActivity).supportActionBar?.apply {
+//            setBackgroundDrawable(ColorDrawable(Color.parseColor("#ffffff")))
+//            title = "Notes App"
+//            setDisplayHomeAsUpEnabled(false)
+//        }
 
         return inflater.inflate(R.layout.fragment_notes, container, false)
 
@@ -93,7 +117,7 @@ class NotesFragment : Fragment() {
         val fab = view.findViewById<FloatingActionButton>(R.id.create_note_fab)
 
         fab.setOnClickListener {
-            notesViewModel.note = Note(0, "", "", "#EEEEEE")
+            notesViewModel.note = Note(0, "", "", colorViewModel.colors.random())
             notesViewModel.notePosition = -1
             parentFragmentManager.commit {
                 replace(R.id.notesFragment, NewNoteFragment())
