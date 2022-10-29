@@ -21,15 +21,23 @@ class DbViewModel(
         appDb.noteDao().delete(note)
     }
 
-    fun updateNoteInDB(id: Int, title: String, content: String, color: String) {
+    fun updateNoteInDB(id: Int, title: String, content: String, color: String, modifiedDate: String, modifiedTime: String) {
         GlobalScope.launch {
-            appDb.noteDao().update(id, title, content, color)
+            appDb.noteDao().update(id, title, content, color, modifiedDate, modifiedTime)
         }
     }
 
-    fun insertNote(title: String, content: String, color: String) {
+    fun insertNote(
+        title: String,
+        content: String,
+        color: String,
+        createdDate: String,
+        createdTime: String,
+        modifiedDate: String,
+        modifiedTime: String
+    ) {
         GlobalScope.launch {
-            appDb.noteDao().insert(Note(null, title, content, color))
+            appDb.noteDao().insert(Note(null, title, content, color, createdDate, createdTime, modifiedDate, modifiedTime))
         }
     }
 

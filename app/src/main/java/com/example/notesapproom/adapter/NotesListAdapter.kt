@@ -94,6 +94,8 @@ class NotesListAdapter : RecyclerView.Adapter<NotesListAdapter.NotesListViewHold
         holder.binding.apply {
             titleText.text = note.title
             noteText.text = note.content
+            createdDateTime.text = "Created: ${note.dateCreated} - ${note.timeCreated}"
+            modifiedDateTime.text = "Modified: ${note.dateModified} - ${note.timeModified}"
             holder.itemView.setBackgroundColor(Color.parseColor(note.color))
         }
     }
