@@ -14,6 +14,8 @@ import com.example.notesapproom.databinding.ItemNoteBinding
 import com.example.notesapproom.diffutils.NotesDiffUtils
 import com.example.notesapproom.interfaces.OnItemClickListener
 import com.example.notesapproom.interfaces.OnNoteOptionsClickListener
+import java.text.SimpleDateFormat
+import java.util.*
 
 class NotesListAdapter : RecyclerView.Adapter<NotesListAdapter.NotesListViewHolder>()
 {
@@ -94,8 +96,30 @@ class NotesListAdapter : RecyclerView.Adapter<NotesListAdapter.NotesListViewHold
         holder.binding.apply {
             titleText.text = note.title
             noteText.text = note.content
-            createdDateTime.text = "Created: ${note.dateCreated} - ${note.timeCreated}"
-            modifiedDateTime.text = "Modified: ${note.dateModified} - ${note.timeModified}"
+
+            val dateFormatter = SimpleDateFormat("yyyy/MM/dd")
+            val calendar = Calendar.getInstance().time
+            val currentDate = dateFormatter.format(calendar)
+            val curr = dateFormatter.parse(currentDate)
+            val modifiedDate = dateFormatter.parse(note.dateModified)
+
+            val diff = kotlin.math.abs(curr.time - modifiedDate.time)
+            val differenceDates = diff / (24 * 60 * 60 * 1000)
+            val days = differenceDates.toString()
+
+
+            time.apply {
+                if(days.toInt() == 0){
+                    text = "${note.timeModified}"
+                }else if(days.toInt() > 1){
+                    text = "${days} days ago"
+                }else{
+                    text = "${days} day ago"
+                }
+            }
+
+
+
             holder.itemView.setBackgroundColor(Color.parseColor(note.color))
         }
     }

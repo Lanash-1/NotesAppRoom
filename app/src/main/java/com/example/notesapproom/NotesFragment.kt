@@ -4,10 +4,9 @@ package com.example.notesapproom
 import android.content.res.Configuration
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
-import android.os.Build
 import android.os.Bundle
 import android.view.*
-import androidx.annotation.RequiresApi
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction.TRANSIT_FRAGMENT_OPEN
@@ -15,24 +14,21 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.commit
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.notesapproom.adapter.NotesListAdapter
+import com.example.notesapproom.adapter.SortAdapter
 import com.example.notesapproom.entity.Note
+import com.example.notesapproom.enums.SortOptions
 import com.example.notesapproom.interfaces.OnItemClickListener
 import com.example.notesapproom.interfaces.OnNoteOptionsClickListener
-import com.example.notesapproom.viewModel.ColorViewModel
-import com.example.notesapproom.viewModel.DbViewModel
-import com.example.notesapproom.viewModel.FavoriteNoteViewModel
-import com.example.notesapproom.viewModel.NotesViewModel
+import com.example.notesapproom.viewModel.*
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.text.SimpleDateFormat
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-import java.util.*
 
 class NotesFragment : Fragment() {
 
@@ -41,6 +37,9 @@ class NotesFragment : Fragment() {
     private val dbViewModel: DbViewModel by activityViewModels()
     private val favoriteNoteViewModel: FavoriteNoteViewModel by activityViewModels()
     private val colorViewModel: ColorViewModel by activityViewModels()
+    private val sortViewModel: SortViewModel by activityViewModels()
+
+    private var sortAdapter = SortAdapter()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -98,20 +97,38 @@ class NotesFragment : Fragment() {
                     setTransition(TRANSIT_FRAGMENT_OPEN)
                 }
             }
-//            R.id.sort -> {
-//                openSortOptions()
-//            }
+            R.id.sort -> {
+                openSortOptions()
+            }
         }
         return super.onOptionsItemSelected(item)
     }
 
-//    private fun openSortOptions() {
-//        val dialog = BottomSheetDialog(requireContext())
-//        val view = layoutInflater.inflate(R.layout.sort_note_bottom_sheet, null)
-//        dialog.setCancelable(true)
-//        dialog.setContentView(view)
-//        dialog.show()
-//    }
+    private fun openSortOptions() {
+        val dialog = BottomSheetDialog(requireContext())
+        val view = layoutInflater.inflate(R.layout.sort_note_bottom_sheet, null)
+        dialog.setCancelable(true)
+        dialog.setContentView(view)
+        dialog.show()
+
+        val sortRecyclerView = view.findViewById<RecyclerView>(R.id.sort_recycler_view)
+        sortAdapter.setSortPosition(sortViewModel.currentSort)
+        sortRecyclerView.adapter = sortAdapter
+        sortRecyclerView.layoutManager = LinearLayoutManager(context)
+
+        sortAdapter.setOnItemClickListener(object: OnItemClickListener{
+            override fun onItemClick(position: Int) {
+
+                sortViewModel.currentSort = position
+                sortAdapter.setSortPosition(position)
+                sortRecyclerView.adapter = sortAdapter
+//                sortAdapter.notifyDataSetChanged()
+//                Toast.makeText(requireContext(), SortOptions.values()[position].name, Toast.LENGTH_SHORT).show()
+//                dialog.dismiss()
+            }
+        })
+
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -123,15 +140,8 @@ class NotesFragment : Fragment() {
         val fab = view.findViewById<FloatingActionButton>(R.id.create_note_fab)
 
         fab.setOnClickListener {
-            val time = Calendar.getInstance().time
-            val timeFormatter = SimpleDateFormat("HH:mm:ss")
-            val dateFormatter = SimpleDateFormat("yyyy-MM-dd")
-            val currentTime = timeFormatter.format(time)
-            val currentDate = dateFormatter.format(time)
 
-            println("DATE: $currentDate")
-            println("TIME: $currentTime")
-            notesViewModel.note = Note(0, "", "", colorViewModel.colors.random(), currentDate, currentTime.toString(), "", "")
+            notesViewModel.note = Note(0, "", "", colorViewModel.colors.random(), "", "", "", "")
             notesViewModel.notePosition = -1
             parentFragmentManager.commit {
                 replace(R.id.notesFragment, NewNoteFragment())
