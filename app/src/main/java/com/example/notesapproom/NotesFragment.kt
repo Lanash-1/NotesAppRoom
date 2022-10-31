@@ -119,6 +119,8 @@ class NotesFragment : Fragment() {
         sortAdapter.setOnItemClickListener(object: OnItemClickListener{
             override fun onItemClick(position: Int) {
 
+                sortNotesList(SortOptions.values()[position])
+
                 sortViewModel.currentSort = position
                 sortAdapter.setSortPosition(position)
                 sortRecyclerView.adapter = sortAdapter
@@ -129,6 +131,56 @@ class NotesFragment : Fragment() {
         })
 
     }
+
+    private fun sortNotesList(sortOptions: SortOptions) {
+        when(sortOptions){
+            SortOptions.TITLE_ASCENDING -> {
+//                val titleAsc = sortNotesByTitle()
+                val newList = notesViewModel.dbNotesList.value!!.sortedBy {
+                    it.title
+                }
+//                return newList
+                notesViewModel.dbNotesList.value = newList as MutableList<Note>
+            }
+            SortOptions.TITLE_DESCENDING -> {
+//                val titleDesc = sortNotesByTitle()
+                val newList = notesViewModel.dbNotesList.value!!.sortedByDescending {
+                    it.title
+                }
+//                return newList
+//                adapter.setNotesList(newList)
+                notesViewModel.dbNotesList.value = newList as MutableList<Note>
+            }
+            SortOptions.DATE_MODIFIED_OLDEST_FIRST -> {
+                val newList = notesViewModel.dbNotesList.value!!.sortedBy {
+                    it.dateModified
+                }
+                notesViewModel.dbNotesList.value = newList as MutableList<Note>
+            }
+            SortOptions.DATE_MODIFIED_NEWEST_FIRST -> {
+                val newList = notesViewModel.dbNotesList.value!!.sortedByDescending {
+                    it.dateModified
+                }
+                notesViewModel.dbNotesList.value = newList as MutableList<Note>
+            }
+            SortOptions.DATE_CREATED_OLDEST_FIRST -> {
+                val newList = notesViewModel.dbNotesList.value!!.sortedBy {
+                    it.dateCreated
+                }
+                notesViewModel.dbNotesList.value = newList as MutableList<Note>
+            }
+            SortOptions.DATE_CREATED_NEWEST_FIRST-> {
+                val newList = notesViewModel.dbNotesList.value!!.sortedByDescending {
+                    it.dateCreated
+                }
+                notesViewModel.dbNotesList.value = newList as MutableList<Note>
+            }
+        }
+    }
+
+//    private fun sortNotesByTitle(): List<Note> {
+//
+//    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
