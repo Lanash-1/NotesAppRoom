@@ -21,10 +21,10 @@ import com.example.notesapproom.viewModel.DbViewModel
 import com.example.notesapproom.viewModel.FavoriteNoteViewModel
 import com.example.notesapproom.viewModel.NotesViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialog
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import java.text.SimpleDateFormat
+import java.util.*
 
 
 class NewNoteFragment : Fragment() {
@@ -81,13 +81,11 @@ class NewNoteFragment : Fragment() {
             titleText.setText(favoriteNoteViewModel.note.title)
             noteText.setText(favoriteNoteViewModel.note.content)
             setNoteColor(favoriteNoteViewModel.note.color)
-        }else{
+        }else {
             titleText.setText(notesViewModel.note.title)
             noteText.setText(notesViewModel.note.content)
             setNoteColor(notesViewModel.note.color)
         }
-
-
 
         noteLayout.setOnClickListener {
             noteText.requestFocus()
@@ -131,24 +129,57 @@ class NewNoteFragment : Fragment() {
 
     private fun insertOrUpdateDb() {
         if(favoriteNoteViewModel.notePosition != -1){
-            favoriteNoteViewModel.noteTitle = titleText.text.toString()
-            favoriteNoteViewModel.noteContent = noteText.text.toString()
-            favoriteNoteViewModel.noteId = favoriteNoteViewModel.favoriteNotes.value!![favoriteNoteViewModel.notePosition].id!!
-            dbViewModel.updateNoteInDB(favoriteNoteViewModel.noteId, favoriteNoteViewModel.noteTitle, favoriteNoteViewModel.noteContent, favoriteNoteViewModel.noteColor)
+//            favoriteNoteViewModel.noteTitle = titleText.text.toString()
+//            favoriteNoteViewModel.noteContent = noteText.text.toString()
+//            favoriteNoteViewModel.noteId = favoriteNoteViewModel.favoriteNotes.value!![favoriteNoteViewModel.notePosition].id!!
+            favoriteNoteViewModel.apply {
+                modifiedDate = getDate()
+                modifiedTime = getTime()
+                noteTitle = titleText.text.toString()
+                noteContent = noteText.text.toString()
+                noteId = favoriteNoteViewModel.favoriteNotes.value!![favoriteNoteViewModel.notePosition].id!!
+            }
+            dbViewModel.updateNoteInDB(favoriteNoteViewModel.noteId, favoriteNoteViewModel.noteTitle, favoriteNoteViewModel.noteContent, favoriteNoteViewModel.noteColor, favoriteNoteViewModel.modifiedDate, favoriteNoteViewModel.modifiedTime)
         }else if(notesViewModel.notePosition == -1){
-            notesViewModel.noteTitle = titleText.text.toString()
-            notesViewModel.noteContent = noteText.text.toString()
+//            notesViewModel.noteTitle = titleText.text.toString()
+//            notesViewModel.noteContent = noteText.text.toString()
+            notesViewModel.apply {
+                createdDate = getDate()
+                createdTime = getTime()
+                modifiedDate = getDate()
+                modifiedTime = getTime()
+                noteTitle = titleText.text.toString()
+                noteContent = noteText.text.toString()
+            }
             if(notesViewModel.noteTitle.isNotEmpty() || notesViewModel.noteContent.isNotEmpty()){
-                dbViewModel.insertNote(notesViewModel.noteTitle, notesViewModel.noteContent, notesViewModel.noteColor)
+                dbViewModel.insertNote(notesViewModel.noteTitle, notesViewModel.noteContent, notesViewModel.noteColor, notesViewModel.createdDate, notesViewModel.createdTime, notesViewModel.modifiedDate, notesViewModel.modifiedTime)
             }
         }
         else{
-            notesViewModel.noteTitle = titleText.text.toString()
-            notesViewModel.noteContent = noteText.text.toString()
+//            notesViewModel.noteTitle = titleText.text.toString()
+//            notesViewModel.noteContent = noteText.text.toString()
+            notesViewModel.apply {
+                modifiedDate = getDate()
+                modifiedTime = getTime()
+                noteTitle = titleText.text.toString()
+                noteContent = noteText.text.toString()
+            }
             notesViewModel.noteId = notesViewModel.dbNotesList.value!![notesViewModel.notePosition].id!!
-            dbViewModel.updateNoteInDB(notesViewModel.noteId, notesViewModel.noteTitle, notesViewModel.noteContent, notesViewModel.noteColor)
+            dbViewModel.updateNoteInDB(notesViewModel.noteId, notesViewModel.noteTitle, notesViewModel.noteContent, notesViewModel.noteColor, notesViewModel.modifiedDate, notesViewModel.modifiedTime)
         }
         moveToNotesFragment()
+    }
+
+    private fun getTime(): String {
+        val time = Calendar.getInstance().time
+        val timeFormatter = SimpleDateFormat("h:mm a")
+        return timeFormatter.format(time)
+    }
+
+    private fun getDate(): String {
+        val time = Calendar.getInstance().time
+        val dateFormatter = SimpleDateFormat("yyyy/MM/dd")
+        return dateFormatter.format(time)
     }
 
     private fun openColorPicker() {

@@ -3,7 +3,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/itemLayout"
     android:layout_width="match_parent"
-    android:layout_height="180dp"
+    android:layout_height="200dp"
     android:background="#fff"
     android:layout_marginStart="16dp"
     android:layout_marginTop="16dp"
@@ -16,7 +16,7 @@
         android:ellipsize="end"
         android:maxLines="2"
         android:layout_margin="8dp"
-        android:text="Untitled Note in one line"
+        android:text="Untitled Note in one line nad can go upto two lines india vs south africa india bat first openers got out for cheap runs"
         android:textColor="@color/black"
         android:textSize="16sp"
         android:textStyle="bold"
@@ -37,7 +37,7 @@
 
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:id="@+id/noteText"
         android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam ultrices neque vel leo blandit facilisis. Integer non tincidunt odio. Nulla iaculis dictum est, eu porttitor turpis fringilla eget. In eu semper nunc, vitae auctor ex. Cras pretium, elit at venenatis commodo, odio mauris cursus turpis, quis malesuada orci felis a lorem. Nullam quis dictum mauris, et aliquet nunc. Sed ipsum orci, mollis vitae varius ac, gravida eget nisl. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas."
         android:ellipsize="end"
@@ -46,7 +46,6 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/titleText"
-        app:layout_constraintBottom_toBottomOf="parent"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
@@ -54,6 +53,14 @@
         android:textSize="14sp"
     />
 
-
+    <TextView
+        android:id="@+id/time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="@id/noteText"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="4dp"
+        android:text="2 days ago"
+        />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

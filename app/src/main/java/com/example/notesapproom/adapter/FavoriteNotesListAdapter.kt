@@ -13,6 +13,8 @@ import com.example.notesapproom.diffutils.NotesDiffUtils
 import com.example.notesapproom.entity.Note
 import com.example.notesapproom.interfaces.OnFavoriteNoteClickListener
 import com.example.notesapproom.interfaces.OnItemClickListener
+import java.text.SimpleDateFormat
+import java.util.*
 
 class FavoriteNotesListAdapter: RecyclerView.Adapter<FavoriteNotesListAdapter.FavoriteNotesListViewHolder>() {
 
@@ -76,6 +78,27 @@ class FavoriteNotesListAdapter: RecyclerView.Adapter<FavoriteNotesListAdapter.Fa
             titleText.text = note.title
             noteText.text = note.content
             holder.itemView.setBackgroundColor(Color.parseColor(note.color))
+
+            val dateFormatter = SimpleDateFormat("yyyy/MM/dd")
+            val calendar = Calendar.getInstance().time
+            val currentDate = dateFormatter.format(calendar)
+            val curr = dateFormatter.parse(currentDate)
+            val modifiedDate = dateFormatter.parse(note.dateModified)
+
+            val diff = kotlin.math.abs(curr.time - modifiedDate.time)
+            val differenceDates = diff / (24 * 60 * 60 * 1000)
+            val days = differenceDates.toString()
+
+
+            time.apply {
+                if(days.toInt() == 0){
+                    text = "${note.timeModified}"
+                }else if(days.toInt() > 1){
+                    text = "$days days ago"
+                }else{
+                    text = "$days day ago"
+                }
+            }
         }
     }
 

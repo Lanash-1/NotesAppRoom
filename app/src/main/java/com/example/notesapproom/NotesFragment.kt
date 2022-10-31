@@ -13,15 +13,16 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.commit
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.notesapproom.adapter.NotesListAdapter
+import com.example.notesapproom.adapter.SortAdapter
 import com.example.notesapproom.entity.Note
+import com.example.notesapproom.enums.SortOptions
 import com.example.notesapproom.interfaces.OnItemClickListener
 import com.example.notesapproom.interfaces.OnNoteOptionsClickListener
-import com.example.notesapproom.viewModel.ColorViewModel
-import com.example.notesapproom.viewModel.DbViewModel
-import com.example.notesapproom.viewModel.FavoriteNoteViewModel
-import com.example.notesapproom.viewModel.NotesViewModel
+import com.example.notesapproom.viewModel.*
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -35,12 +36,14 @@ class NotesFragment : Fragment() {
     private val dbViewModel: DbViewModel by activityViewModels()
     private val favoriteNoteViewModel: FavoriteNoteViewModel by activityViewModels()
     private val colorViewModel: ColorViewModel by activityViewModels()
+    private val sortViewModel: SortViewModel by activityViewModels()
+
+    private var sortAdapter = SortAdapter()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
     }
-
 
     private fun setActionBarProperties(color: String){
         (activity as AppCompatActivity).supportActionBar?.apply {
@@ -68,7 +71,6 @@ class NotesFragment : Fragment() {
         }
 
 
-
 //        (activity as AppCompatActivity).supportActionBar?.apply {
 //            setBackgroundDrawable(ColorDrawable(Color.parseColor("#ffffff")))
 //            title = "Notes App"
@@ -92,19 +94,88 @@ class NotesFragment : Fragment() {
                     setTransition(TRANSIT_FRAGMENT_OPEN)
                 }
             }
-//            R.id.sort -> {
-//                openSortOptions()
-//            }
+            R.id.sort -> {
+                openSortOptions()
+            }
         }
         return super.onOptionsItemSelected(item)
     }
 
-//    private fun openSortOptions() {
-//        val dialog = BottomSheetDialog(requireContext())
-//        val view = layoutInflater.inflate(R.layout.sort_note_bottom_sheet, null)
-//        dialog.setCancelable(true)
-//        dialog.setContentView(view)
-//        dialog.show()
+    private fun openSortOptions() {
+        val dialog = BottomSheetDialog(requireContext())
+        val view = layoutInflater.inflate(R.layout.sort_note_bottom_sheet, null)
+        dialog.setCancelable(true)
+        dialog.setContentView(view)
+        dialog.show()
+
+        val sortRecyclerView = view.findViewById<RecyclerView>(R.id.sort_recycler_view)
+        sortAdapter.setSortPosition(sortViewModel.currentSort)
+        sortRecyclerView.adapter = sortAdapter
+        sortRecyclerView.layoutManager = LinearLayoutManager(context)
+
+        sortAdapter.setOnItemClickListener(object: OnItemClickListener{
+            override fun onItemClick(position: Int) {
+
+                sortNotesList(SortOptions.values()[position])
+
+                sortViewModel.currentSort = position
+                sortAdapter.setSortPosition(position)
+                sortRecyclerView.adapter = sortAdapter
+//                sortAdapter.notifyDataSetChanged()
+//                Toast.makeText(requireContext(), SortOptions.values()[position].name, Toast.LENGTH_SHORT).show()
+//                dialog.dismiss()
+            }
+        })
+    }
+
+    private fun sortNotesList(sortOptions: SortOptions) {
+        when(sortOptions){
+            SortOptions.TITLE_ASCENDING -> {
+//                val titleAsc = sortNotesByTitle()
+                val newList = notesViewModel.dbNotesList.value!!.sortedBy {
+                    it.title
+                }
+//                return newList
+                notesViewModel.dbNotesList.value = newList as MutableList<Note>
+            }
+            SortOptions.TITLE_DESCENDING -> {
+//                val titleDesc = sortNotesByTitle()
+                val newList = notesViewModel.dbNotesList.value!!.sortedByDescending {
+                    it.title
+                }
+//                return newList
+//                adapter.setNotesList(newList)
+                notesViewModel.dbNotesList.value = newList as MutableList<Note>
+            }
+            SortOptions.DATE_MODIFIED_OLDEST_FIRST -> {
+                val newList = notesViewModel.dbNotesList.value!!.sortedBy {
+                    it.dateModified
+                }
+                notesViewModel.dbNotesList.value = newList as MutableList<Note>
+            }
+            SortOptions.DATE_MODIFIED_NEWEST_FIRST -> {
+                val newList = notesViewModel.dbNotesList.value!!.sortedByDescending {
+                    it.dateModified
+                }
+                notesViewModel.dbNotesList.value = newList as MutableList<Note>
+            }
+            SortOptions.DATE_CREATED_OLDEST_FIRST -> {
+                val newList = notesViewModel.dbNotesList.value!!.sortedBy {
+                    it.dateCreated
+                }
+                notesViewModel.dbNotesList.value = newList as MutableList<Note>
+            }
+            SortOptions.DATE_CREATED_NEWEST_FIRST-> {
+                val newList = notesViewModel.dbNotesList.value!!.sortedByDescending {
+                    it.dateCreated
+                }
+                notesViewModel.dbNotesList.value = newList as MutableList<Note>
+            }
+        }
+    }
+
+//    private fun sortNotesByTitle(): List<Note> {
+//
 //    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -117,7 +188,8 @@ class NotesFragment : Fragment() {
         val fab = view.findViewById<FloatingActionButton>(R.id.create_note_fab)
 
         fab.setOnClickListener {
-            notesViewModel.note = Note(0, "", "", colorViewModel.colors.random())
+
+            notesViewModel.note = Note(0, "", "", colorViewModel.colors.random(), "", "", "", "")
             notesViewModel.notePosition = -1
             parentFragmentManager.commit {
                 replace(R.id.notesFragment, NewNoteFragment())
@@ -128,6 +200,7 @@ class NotesFragment : Fragment() {
 
         adapter.setOnItemClickListener(object : OnItemClickListener {
             override fun onItemClick(position: Int) {
+
                 notesViewModel.note = notesViewModel.dbNotesList.value!![position]
                 notesViewModel.notePosition = position
                 parentFragmentManager.commit {

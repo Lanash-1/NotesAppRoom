@@ -6,7 +6,7 @@ import com.example.notesapproom.entity.Note
 
 class NotesViewModel: ViewModel() {
 
-    var note: Note = Note(0, "", "", "#DDDDDD")
+    var note: Note = Note(0, "", "", "#DDDDDD", "", "", "", "")
 
     var dbNotesList = MutableLiveData<MutableList<Note>>()
 
@@ -14,6 +14,10 @@ class NotesViewModel: ViewModel() {
     var noteTitle: String = ""
     var noteContent: String = ""
     var noteColor: String = ""
+    var createdDate: String = ""
+    var createdTime: String = ""
+    var modifiedDate: String = ""
+    var modifiedTime: String = ""
 
     var notePosition = -1
 }
