@@ -6,7 +6,6 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.*
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction.TRANSIT_FRAGMENT_OPEN
@@ -46,7 +45,6 @@ class NotesFragment : Fragment() {
         setHasOptionsMenu(true)
     }
 
-
     private fun setActionBarProperties(color: String){
         (activity as AppCompatActivity).supportActionBar?.apply {
             setBackgroundDrawable(ColorDrawable(Color.parseColor(color)))
@@ -71,7 +69,6 @@ class NotesFragment : Fragment() {
                 setActionBarProperties("#ffffff")
             }
         }
-
 
 
 //        (activity as AppCompatActivity).supportActionBar?.apply {
@@ -129,7 +126,6 @@ class NotesFragment : Fragment() {
 //                dialog.dismiss()
             }
         })
-
     }
 
     private fun sortNotesList(sortOptions: SortOptions) {
@@ -204,7 +200,6 @@ class NotesFragment : Fragment() {
 
         adapter.setOnItemClickListener(object : OnItemClickListener {
             override fun onItemClick(position: Int) {
-
 
                 notesViewModel.note = notesViewModel.dbNotesList.value!![position]
                 notesViewModel.notePosition = position

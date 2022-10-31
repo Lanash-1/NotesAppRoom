@@ -107,18 +107,15 @@ class NotesListAdapter : RecyclerView.Adapter<NotesListAdapter.NotesListViewHold
             val differenceDates = diff / (24 * 60 * 60 * 1000)
             val days = differenceDates.toString()
 
-
             time.apply {
-                if(days.toInt() == 0){
-                    text = "${note.timeModified}"
+                text = if(days.toInt() == 0){
+                    "${note.timeModified}"
                 }else if(days.toInt() > 1){
-                    text = "${days} days ago"
+                    "$days days ago"
                 }else{
-                    text = "${days} day ago"
+                    "$days day ago"
                 }
             }
-
-
 
             holder.itemView.setBackgroundColor(Color.parseColor(note.color))
         }
