@@ -4,6 +4,6 @@ import androidx.lifecycle.ViewModel
 
 class SortViewModel: ViewModel() {
 
-    var currentSort = 4
+    var currentSort = -1
 
 }

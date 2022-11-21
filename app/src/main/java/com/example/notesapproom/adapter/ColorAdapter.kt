@@ -21,7 +21,6 @@ class ColorAdapter: RecyclerView.Adapter<ColorAdapter.ColorViewHolder>() {
         this.listener = listener
     }
 
-
     class ColorViewHolder(val binding: ItemColorBinding, listener: OnItemClickListener): RecyclerView.ViewHolder(binding.root) {
         init {
             itemView.setOnClickListener{
