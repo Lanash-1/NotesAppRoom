@@ -116,7 +116,6 @@ class NotesListAdapter : RecyclerView.Adapter<NotesListAdapter.NotesListViewHold
                     "$days day ago"
                 }
             }
-
             holder.itemView.setBackgroundColor(Color.parseColor(note.color))
         }
     }

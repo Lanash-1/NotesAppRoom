@@ -173,6 +173,7 @@ class NewNoteFragment : Fragment() {
     private fun getTime(): String {
         val time = Calendar.getInstance().time
         val timeFormatter = SimpleDateFormat("h:mm a")
+        println("TIME: ")
         return timeFormatter.format(time)
     }
 

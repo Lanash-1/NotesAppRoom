@@ -188,7 +188,6 @@ class NotesFragment : Fragment() {
         val fab = view.findViewById<FloatingActionButton>(R.id.create_note_fab)
 
         fab.setOnClickListener {
-
             notesViewModel.note = Note(0, "", "", colorViewModel.colors.random(), "", "", "", "")
             notesViewModel.notePosition = -1
             parentFragmentManager.commit {
@@ -234,7 +233,6 @@ class NotesFragment : Fragment() {
                 val noteToBeChecked = notesViewModel.dbNotesList.value!![position]
                 isFavoriteNote(noteToBeChecked, onClicked)
             }
-
         })
 
         recyclerView.adapter = adapter
